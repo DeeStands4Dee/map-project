@@ -30,6 +30,14 @@ public abstract class SplitNode extends Node {
         String getComparator() {
             return comparator;
         }
+        
+        int getBeginIndex() {
+            return beginIndex;
+        }
+
+        int getEndIndex() {
+            return endIndex;
+        }
 
         public String toString() {
             return "[Examples:" + beginIndex + "-" + endIndex + "]" +
