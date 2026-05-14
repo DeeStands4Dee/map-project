@@ -231,52 +231,36 @@ public class Data {
         }
         return s;
     }
+
     public static void main(String[] args) {
         Data data = new Data();
         System.out.println("Prima del sort:");
         System.out.println(data.toString());
-        
+
         data.sort(data.getExplanatoryAttribute(0), 0, data.getNumberOfExamples() - 1);
-        
+
         System.out.println("Dopo il sort per motor:");
         System.out.println(data.toString());
     }
+
     private void swap(int i, int j) {
-        Object[] temp = (Object[]) data[i];
-        data[i] = data[j];
-        data[j] = temp;
-    }
+    Object[] temp = (Object[]) data[i];
+    data[i] = data[j];
+    data[j] = temp;
+}
 
-    private int partition(DiscreteAttribute attribute, int inf, int sup) {
-        int pivotIndex = attribute.getIndex();
-        String pivot = (String) data[inf][pivotIndex];
-        int i = inf;
-        int j = sup;
-
-        while (i < j) {
-            while (i <= sup && ((String) data[i][pivotIndex]).compareTo(pivot) <= 0) {
-                i++;
-            }
-            while (((String) data[j][pivotIndex]).compareTo(pivot) > 0) {
-                j--;
-            }
-            if (i < j) {
-                swap(i, j);
-            }
+public void sort(Attribute attribute, int beginExampleIndex, int endExampleIndex) {
+    int attrIndex = attribute.getIndex();
+    for (int i = beginExampleIndex + 1; i <= endExampleIndex; i++) {
+        Object[] key = (Object[]) data[i];
+        String keyVal = (String) key[attrIndex];
+        int j = i - 1;
+        while (j >= beginExampleIndex && 
+               ((String) data[j][attrIndex]).compareTo(keyVal) > 0) {
+            data[j + 1] = data[j];
+            j--;
         }
-        swap(inf, j);
-        return j;
+        data[j + 1] = key;
     }
-
-    private void quicksort(Attribute attribute, int inf, int sup) {
-        if (inf < sup) {
-            int j = partition((DiscreteAttribute) attribute, inf, sup);
-            quicksort(attribute, inf, j - 1);
-            quicksort(attribute, j + 1, sup);
-        }
-    }
-
-    public void sort(Attribute attribute, int beginExampleIndex, int endExampleIndex) {
-        quicksort(attribute, beginExampleIndex, endExampleIndex);
-    }
+}
 }

@@ -21,6 +21,7 @@ public class RegressionTree {
 
         for (int i = 0; i < trainingSet.getNumberOfExplanatoryAttributes(); i++) {
             Attribute attribute = trainingSet.getExplanatoryAttribute(i);
+            trainingSet.sort(attribute, begin, end);
             DiscreteNode node = new DiscreteNode(trainingSet, begin, end, (DiscreteAttribute) attribute);
 
             if (node.getVariance() < bestVariance) {
@@ -39,6 +40,11 @@ public class RegressionTree {
         } else {
             SplitNode bestNode = determineBestSplitNode(trainingSet, begin, end);
             if (bestNode.getNumberOfChildren() == 0) {
+                root = new LeafNode(trainingSet, begin, end);
+            } else if (bestNode.getNumberOfChildren() == 1 &&
+                    bestNode.getSplitInfo(0).getBeginIndex() == begin &&
+                    bestNode.getSplitInfo(0).getEndIndex() == end) {
+
                 root = new LeafNode(trainingSet, begin, end);
             } else {
                 root = bestNode;
