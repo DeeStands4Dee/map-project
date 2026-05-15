@@ -1,3 +1,11 @@
+package tree;
+
+import utility.keyboard;
+import exceptions.UnknownValueException;
+import data.Attribute;
+import data.Data;
+import data.DiscreteAttribute;
+
 public class RegressionTree {
 
     private Node root;
@@ -93,11 +101,23 @@ public class RegressionTree {
             }
         }
     }
-
-    public static void main(String[] args) {
-        Data trainingSet = new Data();
-        RegressionTree tree = new RegressionTree(trainingSet);
-        tree.printRules();
-        System.out.println(tree.printTree());
+public Double predictClass() throws UnknownValueException {
+    if (root instanceof LeafNode) {
+        System.out.println("Predicted class value: " + ((LeafNode) root).getPredictedClassValue());
+        return ((LeafNode) root).getPredictedClassValue();
+    } else {
+        SplitNode splitNode = (SplitNode) root;
+        System.out.println(splitNode.formulateQuery());
+        for (int i = 0; i < splitNode.getNumberOfChildren(); i++) {
+            System.out.println(i + ":" + splitNode.getAttribute().getName() + "=" + splitNode.getSplitInfo(i).getSplitValue());
+        }
+        int risp = keyboard.readInt();
+        if (risp == -1 || risp >= root.getNumberOfChildren()) {
+            throw new UnknownValueException("The answer should be an integer between 0 and " 
+                + (root.getNumberOfChildren() - 1) + "!");
+        } else {
+            return childTree[risp].predictClass();
+        }
     }
+}
 }

@@ -1,3 +1,8 @@
+package tree;
+
+import data.Data;
+import data.DiscreteAttribute;
+
 public class DiscreteNode extends SplitNode {
 
     public DiscreteNode(Data trainingSet, int beginExampleIndex, 

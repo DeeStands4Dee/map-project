@@ -1,3 +1,8 @@
+package tree;
+import data.Attribute;
+import data.Data;
+import data.DiscreteAttribute;
+
 public abstract class SplitNode extends Node {
 
     class SplitInfo {
