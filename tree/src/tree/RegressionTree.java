@@ -1,7 +1,11 @@
 package tree;
+import java.util.TreeSet;
 
 import utility.keyboard;
 import exceptions.UnknownValueException;
+
+import java.util.TreeSet;
+
 import data.Attribute;
 import data.Data;
 import data.DiscreteAttribute;
@@ -24,20 +28,16 @@ public class RegressionTree {
     }
 
     private SplitNode determineBestSplitNode(Data trainingSet, int begin, int end) {
-        SplitNode bestNode = null;
-        double bestVariance = Double.MAX_VALUE;
+        TreeSet<SplitNode> ts = new TreeSet<SplitNode>();
 
         for (int i = 0; i < trainingSet.getNumberOfExplanatoryAttributes(); i++) {
             Attribute attribute = trainingSet.getExplanatoryAttribute(i);
             trainingSet.sort(attribute, begin, end);
             DiscreteNode node = new DiscreteNode(trainingSet, begin, end, (DiscreteAttribute) attribute);
-
-            if (node.getVariance() < bestVariance) {
-                bestVariance = node.getVariance();
-                bestNode = node;
-            }
+            ts.add(node);
         }
 
+        SplitNode bestNode = ts.first();
         trainingSet.sort(bestNode.getAttribute(), begin, end);
         return bestNode;
     }

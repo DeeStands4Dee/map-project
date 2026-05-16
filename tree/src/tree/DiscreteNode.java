@@ -11,8 +11,8 @@ public class DiscreteNode extends SplitNode {
     }
 
     int testCondition(Object value) {
-        for (int i = 0; i < mapSplit.length; i++) {
-            if (value.equals(mapSplit[i].getSplitValue())) {
+        for (int i = 0; i < mapSplit.size(); i++) {
+    if (value.equals(mapSplit.get(i).getSplitValue())) {
                 return i;
             }
         }
