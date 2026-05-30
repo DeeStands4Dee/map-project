@@ -9,7 +9,7 @@ import data.DiscreteAttribute;
 public abstract class SplitNode extends Node implements Comparable<SplitNode> {
 
     class SplitInfo {
-        
+
         private Object splitValue;
         private int beginIndex;
         private int endIndex;
@@ -31,16 +31,27 @@ public abstract class SplitNode extends Node implements Comparable<SplitNode> {
             this.comparator = comparator;
         }
 
-        Object getSplitValue() { return splitValue; }
-        String getComparator() { return comparator; }
-        int getBeginIndex() { return beginIndex; }
-        int getEndIndex() { return endIndex; }
+        Object getSplitValue() {
+            return splitValue;
+        }
+
+        String getComparator() {
+            return comparator;
+        }
+
+        int getBeginIndex() {
+            return beginIndex;
+        }
+
+        int getEndIndex() {
+            return endIndex;
+        }
 
         public String toString() {
             return "[Examples:" + beginIndex + "-" + endIndex + "]" +
-                   " child=" + numberChild +
-                   " splitValue=" + splitValue +
-                   " comparator=" + comparator;
+                    " child=" + numberChild +
+                    " splitValue=" + splitValue +
+                    " comparator=" + comparator;
         }
     }
 
@@ -73,7 +84,7 @@ public abstract class SplitNode extends Node implements Comparable<SplitNode> {
     }
 
     void setSplitInfo(Data trainingSet, int beginExampleIndex,
-                      int endExampleIndex, Attribute attribute) {
+            int endExampleIndex, Attribute attribute) {
 
         DiscreteAttribute discAttribute = (DiscreteAttribute) attribute;
         trainingSet.sort(discAttribute, beginExampleIndex, endExampleIndex);
@@ -97,32 +108,46 @@ public abstract class SplitNode extends Node implements Comparable<SplitNode> {
 
     @Override
     public int compareTo(SplitNode o) {
-        if (this.splitVariance == o.splitVariance) return 0;
-        else if (this.splitVariance < o.splitVariance) return -1;
-        else return 1;
+        if (this.splitVariance == o.splitVariance)
+            return 0;
+        else if (this.splitVariance < o.splitVariance)
+            return -1;
+        else
+            return 1;
     }
 
     abstract int testCondition(Object value);
 
-    Attribute getAttribute() { return attribute; }
+    Attribute getAttribute() {
+        return attribute;
+    }
 
-    public double getVariance() { return splitVariance; }
+    public double getSplitVariance() {
+        return splitVariance;
+    }
 
-    public int getNumberOfChildren() { return mapSplit.size(); }
+    public int getNumberOfChildren() {
+        return mapSplit.size();
+    }
 
-    SplitInfo getSplitInfo(int child) { return mapSplit.get(child); }
+    SplitInfo getSplitInfo(int child) {
+        return mapSplit.get(child);
+    }
 
-    String formulateQuery() { return attribute.getName() + "="; }
+    String formulateQuery() {
+        return attribute.getName() + "=";
+    }
 
     public String toString() {
         String s = "DISCRETE SPLIT : attribute=" + attribute.getName() +
-                   " Nodo: [Examples:" + getBeginExampleIndex() +
-                   "-" + getEndExampleIndex() + "]" +
-                   " variance:" + getVariance() + "\n";
+                " Nodo: [Examples:" + getBeginExampleIndex() +
+                "-" + getEndExampleIndex() + "]" +
+                " variance:" + super.getVariance() + "\n" +
+                "Split Variance: " + splitVariance + "\n";
         for (int i = 0; i < mapSplit.size(); i++) {
             s += "child " + i + " split value=" + mapSplit.get(i).splitValue +
-                 "[Examples:" + mapSplit.get(i).beginIndex +
-                 "-" + mapSplit.get(i).endIndex + "]\n";
+                    "[Examples:" + mapSplit.get(i).beginIndex +
+                    "-" + mapSplit.get(i).endIndex + "]\n";
         }
         return s;
     }
