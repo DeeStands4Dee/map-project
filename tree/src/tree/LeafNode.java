@@ -1,5 +1,6 @@
 package tree;
 import data.Data;
+import java.io.Serializable;
 
 public class LeafNode extends Node {
 

@@ -2,8 +2,9 @@ package tree;
 
 import data.Data;
 import data.DiscreteAttribute;
+import java.io.Serializable;
 
-public class DiscreteNode extends SplitNode {
+public class DiscreteNode extends SplitNode implements Serializable {
 
     public DiscreteNode(Data trainingSet, int beginExampleIndex, 
                         int endExampleIndex, DiscreteAttribute attribute) {

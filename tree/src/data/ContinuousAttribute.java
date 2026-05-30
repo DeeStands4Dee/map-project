@@ -1,5 +1,7 @@
 package data;
-public class ContinuousAttribute extends Attribute {
+import java.io.Serializable;
+
+public class ContinuousAttribute extends Attribute implements Serializable {
 
     public ContinuousAttribute(String name, int index) {
         super(name, index);

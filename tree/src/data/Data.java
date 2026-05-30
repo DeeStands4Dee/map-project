@@ -24,8 +24,14 @@ public class Data {
                 String line = scanner.nextLine().trim();
                 String[] parts = line.split("\\s+");
                 String attrName = parts[1];
-                Set<String> values = new TreeSet<>(Arrays.asList(parts[2].split(",")));
-                explanatorySet.add(new DiscreteAttribute(attrName, index, values));
+                if (parts.length == 3) {
+                    // attributo discreto — ha i valori elencati
+                    Set<String> values = new TreeSet<>(Arrays.asList(parts[2].split(",")));
+                    explanatorySet.add(new DiscreteAttribute(attrName, index, values));
+                } else {
+                    // attributo continuo — nessun valore elencato
+                    explanatorySet.add(new ContinuousAttribute(attrName, index));
+                }
                 index++;
             }
 
@@ -45,7 +51,11 @@ public class Data {
                 String line = scanner.nextLine().trim();
                 String[] values = line.split(",");
                 for (int j = 0; j < explanatorySet.size(); j++) {
-                    data[i][j] = values[j].trim();
+                    if (explanatorySet.get(j) instanceof DiscreteAttribute) {
+                        data[i][j] = values[j].trim();
+                    } else {
+                        data[i][j] = Double.parseDouble(values[j].trim());
+                    }
                 }
                 data[i][explanatorySet.size()] = Double.parseDouble(values[explanatorySet.size()].trim());
             }
@@ -93,17 +103,79 @@ public class Data {
     }
 
     public void sort(Attribute attribute, int beginExampleIndex, int endExampleIndex) {
-        int attrIndex = attribute.getIndex();
-        for (int i = beginExampleIndex + 1; i <= endExampleIndex; i++) {
-            Object[] key = (Object[]) data[i];
-            String keyVal = (String) key[attrIndex];
-            int j = i - 1;
-            while (j >= beginExampleIndex &&
-                    ((String) data[j][attrIndex]).compareTo(keyVal) > 0) {
-                data[j + 1] = data[j];
+        quicksort(attribute, beginExampleIndex, endExampleIndex);
+    }
+
+    private void swap(int i, int j) {
+        Object temp;
+        for (int k = 0; k < getNumberOfExplanatoryAttributes() + 1; k++) {
+            temp = data[i][k];
+            data[i][k] = data[j][k];
+            data[j][k] = temp;
+        }
+    }
+
+    private int partition(DiscreteAttribute attribute, int inf, int sup) {
+        int i, j;
+        i = inf;
+        j = sup;
+        int med = (inf + sup) / 2;
+        String x = (String) getExplanatoryValue(med, attribute.getIndex());
+        swap(inf, med);
+
+        while (true) {
+            while (i <= sup && ((String) getExplanatoryValue(i, attribute.getIndex())).compareTo(x) <= 0) {
+                i++;
+            }
+            while (((String) getExplanatoryValue(j, attribute.getIndex())).compareTo(x) > 0) {
                 j--;
             }
-            data[j + 1] = key;
+            if (i < j) {
+                swap(i, j);
+            } else break;
+        }
+        swap(inf, j);
+        return j;
+    }
+
+    private int partition(ContinuousAttribute attribute, int inf, int sup) {
+        int i, j;
+        i = inf;
+        j = sup;
+        int med = (inf + sup) / 2;
+        Double x = (Double) getExplanatoryValue(med, attribute.getIndex());
+        swap(inf, med);
+
+        while (true) {
+            while (i <= sup && ((Double) getExplanatoryValue(i, attribute.getIndex())).compareTo(x) <= 0) {
+                i++;
+            }
+            while (((Double) getExplanatoryValue(j, attribute.getIndex())).compareTo(x) > 0) {
+                j--;
+            }
+            if (i < j) {
+                swap(i, j);
+            } else break;
+        }
+        swap(inf, j);
+        return j;
+    }
+
+    private void quicksort(Attribute attribute, int inf, int sup) {
+        if (sup >= inf) {
+            int pos;
+            if (attribute instanceof DiscreteAttribute)
+                pos = partition((DiscreteAttribute) attribute, inf, sup);
+            else
+                pos = partition((ContinuousAttribute) attribute, inf, sup);
+
+            if ((pos - inf) < (sup - pos + 1)) {
+                quicksort(attribute, inf, pos - 1);
+                quicksort(attribute, pos + 1, sup);
+            } else {
+                quicksort(attribute, pos + 1, sup);
+                quicksort(attribute, inf, pos - 1);
+            }
         }
     }
 }

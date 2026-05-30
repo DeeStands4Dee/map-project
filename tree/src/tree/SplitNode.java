@@ -5,11 +5,10 @@ import java.util.List;
 import data.Attribute;
 import data.Data;
 import data.DiscreteAttribute;
+import java.io.Serializable;
 
-public abstract class SplitNode extends Node implements Comparable<SplitNode> {
-
-    class SplitInfo {
-
+public abstract class SplitNode extends Node implements Comparable<SplitNode>, Serializable {
+    class SplitInfo implements Serializable {
         private Object splitValue;
         private int beginIndex;
         private int endIndex;
