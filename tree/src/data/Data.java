@@ -1,69 +1,78 @@
 package data;
 
-import java.io.*;
-import java.util.*;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import database.DbAccess;
+import database.DatabaseConnectionException;
+import database.EmptySetException;
+import database.Example;
+import database.TableData;
+import database.TableSchema;
+import database.Column;
 import exceptions.TrainingDataException;
 
 public class Data {
 
-    private Object data[][];
+    private List<Example> data = new ArrayList<Example>();
     private int numberOfExamples;
     private List<Attribute> explanatorySet = new LinkedList<Attribute>();
     private ContinuousAttribute classAttribute;
 
-    public Data(String fileName) throws TrainingDataException {
+    public Data(String tableName) throws TrainingDataException {
+        DbAccess db = new DbAccess();
         try {
-            Scanner scanner = new Scanner(new File(fileName));
+            db.initConnection();
 
-            String schemaLine = scanner.nextLine().trim();
-            int numberOfAttributes = Integer.parseInt(schemaLine.split("\\s+")[1]);
+            TableSchema tSchema = new TableSchema(db, tableName);
 
-            int index = 0;
+            if (tSchema.getNumberOfAttributes() < 2)
+                throw new TrainingDataException("La tabella ha meno di due colonne!");
 
-            for (int i = 0; i < numberOfAttributes; i++) {
-                String line = scanner.nextLine().trim();
-                String[] parts = line.split("\\s+");
-                String attrName = parts[1];
-                if (parts.length == 3) {
-                    // attributo discreto — ha i valori elencati
-                    Set<String> values = new TreeSet<>(Arrays.asList(parts[2].split(",")));
-                    explanatorySet.add(new DiscreteAttribute(attrName, index, values));
+            // Ultima colonna = attributo target (deve essere numerico)
+            Column classColumn = tSchema.getColumn(tSchema.getNumberOfAttributes() - 1);
+            if (!classColumn.isNumber())
+                throw new TrainingDataException("L'ultima colonna non è numerica!");
+
+            // Costruisce explanatorySet (tutte le colonne tranne l'ultima)
+            for (int i = 0; i < tSchema.getNumberOfAttributes() - 1; i++) {
+                Column col = tSchema.getColumn(i);
+                if (col.isNumber()) {
+                    explanatorySet.add(new ContinuousAttribute(col.getColumnName(), i));
                 } else {
-                    // attributo continuo — nessun valore elencato
-                    explanatorySet.add(new ContinuousAttribute(attrName, index));
+                    TableData td = new TableData(db);
+                    Set<Object> distinctValues = td.getDistinctColumnValues(tableName, col);
+                    Set<String> stringValues = new TreeSet<String>();
+                    for (Object o : distinctValues)
+                        stringValues.add(o.toString());
+                    explanatorySet.add(new DiscreteAttribute(col.getColumnName(), i, stringValues));
                 }
-                index++;
             }
 
-            String targetLine = scanner.nextLine().trim();
-            String targetName = targetLine.split("\\s+")[1];
-            classAttribute = new ContinuousAttribute(targetName, index);
+            // Attributo classe
+            classAttribute = new ContinuousAttribute(
+                classColumn.getColumnName(),
+                tSchema.getNumberOfAttributes() - 1
+            );
 
-            String dataLine = scanner.nextLine().trim();
-            numberOfExamples = Integer.parseInt(dataLine.split("\\s+")[1]);
+            // Carica le transazioni
+            TableData tableData = new TableData(db);
+            List<Example> transactions = tableData.getTransazioni(tableName);
+            numberOfExamples = transactions.size();
+            data = transactions;
 
-            if (numberOfExamples == 0) {
-                throw new TrainingDataException("Training set vuoto!");
-            }
-
-            data = new Object[numberOfExamples][explanatorySet.size() + 1];
-            for (int i = 0; i < numberOfExamples; i++) {
-                String line = scanner.nextLine().trim();
-                String[] values = line.split(",");
-                for (int j = 0; j < explanatorySet.size(); j++) {
-                    if (explanatorySet.get(j) instanceof DiscreteAttribute) {
-                        data[i][j] = values[j].trim();
-                    } else {
-                        data[i][j] = Double.parseDouble(values[j].trim());
-                    }
-                }
-                data[i][explanatorySet.size()] = Double.parseDouble(values[explanatorySet.size()].trim());
-            }
-
-            scanner.close();
-
-        } catch (FileNotFoundException e) {
-            throw new TrainingDataException(e.toString());
+        } catch (DatabaseConnectionException e) {
+            throw new TrainingDataException("Connessione al database fallita: " + e.getMessage());
+        } catch (SQLException e) {
+            throw new TrainingDataException("Errore SQL: " + e.getMessage());
+        } catch (EmptySetException e) {
+            throw new TrainingDataException("La tabella è vuota!");
+        } finally {
+            db.closeConnection();
         }
     }
 
@@ -76,11 +85,11 @@ public class Data {
     }
 
     public Double getClassValue(int exampleIndex) {
-        return (Double) data[exampleIndex][classAttribute.getIndex()];
+        return (Double) data.get(exampleIndex).get(classAttribute.getIndex());
     }
 
     public Object getExplanatoryValue(int exampleIndex, int attributeIndex) {
-        return data[exampleIndex][attributeIndex];
+        return data.get(exampleIndex).get(attributeIndex);
     }
 
     public Attribute getExplanatoryAttribute(int index) {
@@ -95,9 +104,9 @@ public class Data {
         String s = "";
         for (int i = 0; i < numberOfExamples; i++) {
             for (int j = 0; j < explanatorySet.size(); j++) {
-                s += data[i][j] + " ";
+                s += data.get(i).get(j) + " ";
             }
-            s += data[i][classAttribute.getIndex()] + "\n";
+            s += data.get(i).get(classAttribute.getIndex()) + "\n";
         }
         return s;
     }
@@ -107,12 +116,9 @@ public class Data {
     }
 
     private void swap(int i, int j) {
-        Object temp;
-        for (int k = 0; k < getNumberOfExplanatoryAttributes() + 1; k++) {
-            temp = data[i][k];
-            data[i][k] = data[j][k];
-            data[j][k] = temp;
-        }
+        Example temp = data.get(i);
+        data.set(i, data.get(j));
+        data.set(j, temp);
     }
 
     private int partition(DiscreteAttribute attribute, int inf, int sup) {

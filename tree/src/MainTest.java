@@ -17,16 +17,16 @@ public class MainTest {
             decision = keyboard.readInt();
         } while (!(decision == 1) && !(decision == 2));
 
-        String trainingfileName = "";
-        System.out.println("File name:");
-        trainingfileName = keyboard.readString();
+        String tableName = "";
+        System.out.println("Table/File name:");
+        tableName = keyboard.readString();
 
         RegressionTree tree = null;
         if (decision == 1) {
             System.out.println("Starting data acquisition phase!");
             Data trainingSet = null;
             try {
-                trainingSet = new Data(trainingfileName + ".dat");
+                trainingSet = new Data(tableName);
             } catch (TrainingDataException e) {
                 System.out.println(e);
                 return;
@@ -35,19 +35,18 @@ public class MainTest {
             System.out.println("Starting learning phase!");
             tree = new RegressionTree(trainingSet);
             try {
-                tree.salva(trainingfileName + ".dmp");
+                tree.salva(tableName + ".dmp");
             } catch (IOException e) {
                 System.out.println(e.toString());
             }
         } else {
             try {
-                tree = RegressionTree.carica(trainingfileName + ".dmp");
+                tree = RegressionTree.carica(tableName + ".dmp");
             } catch (ClassNotFoundException | IOException e) {
                 System.out.print(e);
                 return;
             }
         }
-
         tree.printRules();
         System.out.println(tree.printTree());
 
