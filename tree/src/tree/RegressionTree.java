@@ -2,7 +2,6 @@ package tree;
 
 import java.io.*;
 import java.util.TreeSet;
-
 import utility.keyboard;
 import exceptions.UnknownValueException;
 import data.Attribute;
@@ -149,5 +148,27 @@ public class RegressionTree implements Serializable {
         RegressionTree tree = (RegressionTree) in.readObject();
         in.close();
         return tree;
+    }
+
+    public Double predictClass(ObjectInputStream in, ObjectOutputStream out)
+            throws UnknownValueException, IOException, ClassNotFoundException {
+        if (root instanceof LeafNode) {
+            return ((LeafNode) root).getPredictedClassValue();
+        } else {
+            SplitNode splitNode = (SplitNode) root;
+            out.writeObject("QUERY");
+            String query = "";
+            for (int i = 0; i < splitNode.getNumberOfChildren(); i++) {
+                query += i + ":" + splitNode.getAttribute().getName() +
+                        splitNode.getSplitInfo(i).getComparator() +
+                        splitNode.getSplitInfo(i).getSplitValue() + "\n";
+            }
+            out.writeObject(query);
+            int risp = (Integer) in.readObject();
+            if (risp == -1 || risp >= root.getNumberOfChildren()) {
+                throw new UnknownValueException("Risposta non valida!");
+            }
+            return childTree[risp].predictClass(in, out);
+        }
     }
 }
