@@ -17,6 +17,11 @@ import javafx.scene.control.*;
  * tramite l'interfaccia grafica JavaFX.
  */
 public class MainWindowController {
+	
+	/**
+	 * Costruttore di default.
+	 */
+	public MainWindowController() {}
 
     @FXML private TextField serverField;
     @FXML private TextField portField;

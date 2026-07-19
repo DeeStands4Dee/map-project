@@ -13,8 +13,6 @@ import tree.RegressionTree;
 /**
  * Classe che gestisce la comunicazione con un singolo client.
  * Estende Thread per gestire ogni client in modo concorrente.
- * Gestisce le richieste del client per l'apprendimento e la predizione
- * dell'albero di regressione.
  */
 public class ServerOneClient extends Thread {
 
@@ -45,7 +43,6 @@ public class ServerOneClient extends Thread {
 
     /**
      * Metodo run del thread che gestisce le richieste del client.
-     * Gestisce i seguenti codici di richiesta:
      * 0 - carica dati dal database
      * 1 - apprendi albero di regressione
      * 2 - carica albero da file
@@ -72,11 +69,7 @@ public class ServerOneClient extends Thread {
                         tree.salva(tableName + ".dmp");
                         out.writeObject("OK");
                         out.flush();
-                        String rules = tree.printTree() + "\n" + tree.getRules();
-                        out.writeObject(rules);
-                        out.flush();
                     } catch (Exception e) {
-                        e.printStackTrace();
                         out.writeObject(e.getMessage());
                         out.flush();
                     }
@@ -86,8 +79,6 @@ public class ServerOneClient extends Thread {
                     try {
                         tree = RegressionTree.carica(tableName + ".dmp");
                         out.writeObject("OK");
-                        out.flush();
-                        out.writeObject(tree.printTree() + "\n" + tree.getRules());
                         out.flush();
                     } catch (Exception e) {
                         out.writeObject(e.getMessage());
@@ -122,7 +113,6 @@ public class ServerOneClient extends Thread {
 
     /**
      * Gestisce la predizione della classe per il client.
-     * Naviga l'albero di regressione in base alle scelte del client.
      * @throws IOException se si verifica un errore nella comunicazione.
      * @throws ClassNotFoundException se la classe dell'oggetto ricevuto non è trovata.
      */

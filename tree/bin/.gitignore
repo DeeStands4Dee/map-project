@@ -1,8 +1,6 @@
-/MainTest.class
-/client/
-/data/
-/database/
-/exceptions/
 /server/
 /tree/
-/utility/
+/database/
+/data/
+/exceptions/
+/client/

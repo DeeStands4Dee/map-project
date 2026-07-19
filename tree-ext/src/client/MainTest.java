@@ -9,8 +9,16 @@ import java.net.UnknownHostException;
 
 import utility.keyboard;
 
+/**
+ * Classe principale del client testuale.
+ * Gestisce la comunicazione con il server tramite socket.
+ */
 public class MainTest {
-
+	
+	 /**
+     * Metodo principale che avvia il client.
+     * @param args args[0] indirizzo server, args[1] porta server.
+     */
     public static void main(String[] args) {
 
         InetAddress addr;
@@ -102,4 +110,8 @@ public class MainTest {
             System.out.println(e.toString());
         }
     }
+    /**
+     * Costruttore di default.
+     */
+    public MainTest() {}
 }

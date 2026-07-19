@@ -64,4 +64,8 @@ public class Example implements Comparable<Example>, Iterable<Object> {
     public Iterator<Object> iterator() {
         return example.iterator();
     }
+    /**
+     * Costruttore di default.
+     */
+    public Example() {}
 }

@@ -9,27 +9,55 @@ import data.ContinuousAttribute;
 import data.Data;
 import data.DiscreteAttribute;
 
+/**
+ * Classe che modella un albero di regressione.
+ * Implementa l'apprendimento, la stampa, la serializzazione
+ * e la predizione dell'albero di regressione.
+ */
 public class RegressionTree implements Serializable {
 
+    /** Nodo radice dell'albero. */
     private Node root;
+    /** Array di sottoalberi figli. */
     private RegressionTree childTree[];
 
+    /**
+     * Costruttore di default.
+     */
     public RegressionTree() {
     }
 
+    /**
+     * Costruttore che apprende l'albero dal dataset di addestramento.
+     * @param trainingSet dataset di addestramento.
+     */
     public RegressionTree(Data trainingSet) {
         learnTree(trainingSet, 0, trainingSet.getNumberOfExamples() - 1,
                 trainingSet.getNumberOfExamples() / 10);
     }
 
+    /**
+     * Verifica se un nodo deve essere una foglia.
+     * @param trainingSet dataset di addestramento.
+     * @param begin indice iniziale.
+     * @param end indice finale.
+     * @param numberOfExamplesPerLeaf numero minimo di esempi per foglia.
+     * @return true se il nodo deve essere una foglia.
+     */
     private boolean isLeaf(Data trainingSet, int begin, int end, int numberOfExamplesPerLeaf) {
         return (end - begin + 1) <= numberOfExamplesPerLeaf;
     }
 
+    /**
+     * Determina il miglior nodo di split per un sottoinsieme del dataset.
+     * @param trainingSet dataset di addestramento.
+     * @param begin indice iniziale.
+     * @param end indice finale.
+     * @return miglior nodo di split.
+     */
     private SplitNode determineBestSplitNode(Data trainingSet, int begin, int end) {
         TreeSet<SplitNode> ts = new TreeSet<SplitNode>();
         SplitNode currentNode = null;
-
         for (int i = 0; i < trainingSet.getNumberOfExplanatoryAttributes(); i++) {
             Attribute a = trainingSet.getExplanatoryAttribute(i);
             if (a instanceof DiscreteAttribute) {
@@ -45,12 +73,18 @@ public class RegressionTree implements Serializable {
                 ts.add(currentNode);
             }
         }
-
         SplitNode bestNode = ts.first();
         trainingSet.sort(bestNode.getAttribute(), begin, end);
         return bestNode;
     }
 
+    /**
+     * Apprende ricorsivamente l'albero di regressione.
+     * @param trainingSet dataset di addestramento.
+     * @param begin indice iniziale.
+     * @param end indice finale.
+     * @param numberOfExamplesPerLeaf numero minimo di esempi per foglia.
+     */
     private void learnTree(Data trainingSet, int begin, int end, int numberOfExamplesPerLeaf) {
         if (isLeaf(trainingSet, begin, end, numberOfExamplesPerLeaf)) {
             root = new LeafNode(trainingSet, begin, end);
@@ -76,6 +110,10 @@ public class RegressionTree implements Serializable {
         }
     }
 
+    /**
+     * Restituisce una rappresentazione testuale dell'albero.
+     * @return stringa con la struttura dell'albero.
+     */
     public String toString() {
         String tree = root.toString() + "\n";
         if (root instanceof SplitNode) {
@@ -86,16 +124,27 @@ public class RegressionTree implements Serializable {
         return tree;
     }
 
+    /**
+     * Restituisce la struttura dell'albero in formato leggibile.
+     * @return stringa con la struttura dell'albero.
+     */
     public String printTree() {
         return "\n********* TREE **********\n\n" + toString() + "\n*************************\n";
     }
 
+    /**
+     * Stampa le regole dell'albero su console.
+     */
     public void printRules() {
         System.out.println("\n********* RULES **********\n");
         printRules("");
         System.out.println("\n*************************\n");
     }
 
+    /**
+     * Stampa ricorsivamente le regole dell'albero.
+     * @param current regola corrente costruita fino a questo nodo.
+     */
     private void printRules(String current) {
         if (root instanceof LeafNode) {
             System.out.println(current + " ==> Class=" + ((LeafNode) root).getPredictedClassValue());
@@ -114,7 +163,12 @@ public class RegressionTree implements Serializable {
             }
         }
     }
-
+    
+    /**
+     * Predice la classe per un nuovo esempio tramite input da tastiera.
+     * @return valore della classe predetta.
+     * @throws UnknownValueException se la risposta non è valida.
+     */
     public Double predictClass() throws UnknownValueException {
         if (root instanceof LeafNode) {
             System.out.println(((LeafNode) root).getPredictedClassValue());
@@ -136,12 +190,26 @@ public class RegressionTree implements Serializable {
         }
     }
 
+    /**
+     * Serializza l'albero su file.
+     * @param nomeFile nome del file su cui salvare l'albero.
+     * @throws FileNotFoundException se il file non viene trovato.
+     * @throws IOException se si verifica un errore di I/O.
+     */
     public void salva(String nomeFile) throws FileNotFoundException, IOException {
         ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(nomeFile));
         out.writeObject(this);
         out.close();
     }
 
+    /**
+     * Carica un albero da file.
+     * @param nomeFile nome del file da cui caricare l'albero.
+     * @return albero di regressione caricato.
+     * @throws FileNotFoundException se il file non viene trovato.
+     * @throws IOException se si verifica un errore di I/O.
+     * @throws ClassNotFoundException se la classe non viene trovata.
+     */
     public static RegressionTree carica(String nomeFile)
             throws FileNotFoundException, IOException, ClassNotFoundException {
         ObjectInputStream in = new ObjectInputStream(new FileInputStream(nomeFile));
@@ -150,8 +218,16 @@ public class RegressionTree implements Serializable {
         return tree;
     }
 
+    /**
+     * Predice la classe per un nuovo esempio tramite socket.
+     * @param in stream di input dal client.
+     * @param out stream di output verso il client.
+     * @return valore della classe predetta.
+     * @throws IOException se si verifica un errore nella comunicazione.
+     * @throws ClassNotFoundException se la classe dell'oggetto ricevuto non è trovata.
+     */
     public Double predictClass(ObjectInputStream in, ObjectOutputStream out)
-            throws UnknownValueException, IOException, ClassNotFoundException {
+            throws IOException, ClassNotFoundException {
         if (root instanceof LeafNode) {
             return ((LeafNode) root).getPredictedClassValue();
         } else {
@@ -165,8 +241,9 @@ public class RegressionTree implements Serializable {
             }
             out.writeObject(query);
             int risp = (Integer) in.readObject();
-            if (risp == -1 || risp >= root.getNumberOfChildren()) {
-                throw new UnknownValueException("Risposta non valida!");
+            if (risp < 0 || risp >= root.getNumberOfChildren()) {
+                out.writeObject("ERR Risposta non valida! Scegli tra 0 e " + (root.getNumberOfChildren() - 1));
+                return null;
             }
             return childTree[risp].predictClass(in, out);
         }

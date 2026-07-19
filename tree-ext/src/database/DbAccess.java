@@ -65,4 +65,8 @@ public class DbAccess {
             System.out.println(e.getMessage());
         }
     }
+    /**
+     * Costruttore di default.
+     */
+    public DbAccess() {}
 }

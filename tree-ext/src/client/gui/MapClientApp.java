@@ -12,6 +12,11 @@ import javafx.stage.Stage;
  */
 public class MapClientApp extends Application {
 
+	/**
+	 * Costruttore di default.
+	 */
+	public MapClientApp() {}
+	
     /**
      * Metodo di avvio dell'applicazione JavaFX.
      * Carica il layout FXML e configura la finestra principale.
