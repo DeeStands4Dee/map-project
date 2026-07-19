@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="client.gui.MainWindowController"
+            prefWidth="800" prefHeight="600"
+            minWidth="500" minHeight="400">
+
+    <top>
+        <VBox spacing="10" style="-fx-background-color: #2c3e50; -fx-padding: 15;">
+            <Label text="MAP - Regression Tree"
+                   style="-fx-font-size: 20px; -fx-text-fill: white; -fx-font-weight: bold;"/>
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Server:" style="-fx-text-fill: white;"/>
+                <TextField fx:id="serverField" text="localhost" prefWidth="120"/>
+                <Label text="Porta:" style="-fx-text-fill: white;"/>
+                <TextField fx:id="portField" text="8080" prefWidth="60"/>
+                <Button fx:id="connectButton" text="Connetti" onAction="#handleConnect"
+                        style="-fx-background-color: #27ae60; -fx-text-fill: white;"/>
+                <Button fx:id="disconnectButton" text="Disconnetti" onAction="#handleDisconnect"
+                        disable="true"
+                        style="-fx-background-color: #c0392b; -fx-text-fill: white;"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <VBox spacing="10" style="-fx-padding: 15;">
+
+            <!-- Tabella + bottoni -->
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Tabella:" style="-fx-font-size: 14px;"/>
+                <TextField fx:id="tableField" text="provaC" HBox.hgrow="ALWAYS"/>
+                <Button fx:id="learnButton" text="Apprendi albero" onAction="#handleLearn"
+                        disable="true"
+                        style="-fx-background-color: #2980b9; -fx-text-fill: white;"/>
+                <Button fx:id="loadButton" text="Carica albero" onAction="#handleLoad"
+                        disable="true"
+                        style="-fx-background-color: #8e44ad; -fx-text-fill: white;"/>
+            </HBox>
+
+            <Separator/>
+
+            <!-- SplitPane orizzontale: Log | Regole -->
+            <SplitPane dividerPositions="0.5" VBox.vgrow="ALWAYS">
+                <VBox spacing="5" minWidth="200">
+                    <Label text="Log:" style="-fx-font-weight: bold;"/>
+                    <TextArea fx:id="logArea" editable="false"
+                              VBox.vgrow="ALWAYS"
+                              style="-fx-font-family: monospace;"/>
+                </VBox>
+                <VBox spacing="5" minWidth="200">
+                    <Label text="Regole albero:" style="-fx-font-weight: bold;"/>
+                    <TextArea fx:id="rulesArea" editable="false"
+                              VBox.vgrow="ALWAYS"
+                              style="-fx-font-family: monospace;"/>
+                </VBox>
+            </SplitPane>
+
+            <Separator/>
+
+            <!-- Predizione -->
+            <Label text="Predizione:" style="-fx-font-weight: bold;"/>
+            <HBox spacing="10" alignment="CENTER_LEFT" fx:id="predictionBox" disable="true">
+                <ComboBox fx:id="choiceBox" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                <Button text="Scegli" onAction="#handleChoice"
+                        style="-fx-background-color: #e67e22; -fx-text-fill: white;"/>
+            </HBox>
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Button fx:id="predictButton" text="Avvia Predizione" onAction="#handlePredict"
+                        disable="true"
+                        style="-fx-background-color: #e74c3c; -fx-text-fill: white;"/>
+                <Button fx:id="resetButton" text="Reset" onAction="#handleReset"
+                        style="-fx-background-color: #95a5a6; -fx-text-fill: white;"/>
+                <Label fx:id="resultLabel" style="-fx-font-size: 14px; -fx-font-weight: bold;"
+                       HBox.hgrow="ALWAYS"/>
+            </HBox>
+
+        </VBox>
+    </center>
+
+</BorderPane>
