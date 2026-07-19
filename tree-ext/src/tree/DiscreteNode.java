@@ -1,26 +1,38 @@
 package tree;
 
+import java.io.Serializable;
 import data.Data;
 import data.DiscreteAttribute;
-import java.io.Serializable;
 
+/**
+ * Classe che modella un nodo di split per attributi discreti.
+ * Estende SplitNode per gestire attributi categorici.
+ */
 public class DiscreteNode extends SplitNode implements Serializable {
 
-    public DiscreteNode(Data trainingSet, int beginExampleIndex, 
-                        int endExampleIndex, DiscreteAttribute attribute) {
+    /**
+     * Costruttore che inizializza il nodo per un attributo discreto.
+     * @param trainingSet dataset di addestramento.
+     * @param beginExampleIndex indice del primo esempio.
+     * @param endExampleIndex indice dell'ultimo esempio.
+     * @param attribute attributo discreto rispetto al quale effettuare lo split.
+     */
+    public DiscreteNode(Data trainingSet, int beginExampleIndex,
+            int endExampleIndex, DiscreteAttribute attribute) {
         super(trainingSet, beginExampleIndex, endExampleIndex, attribute);
     }
 
-    int testCondition(Object value) {
-        for (int i = 0; i < mapSplit.size(); i++) {
-    if (value.equals(mapSplit.get(i).getSplitValue())) {
-                return i;
-            }
+    /**
+     * Verifica la condizione di split per un valore discreto.
+     * @param value valore da verificare.
+     * @return indice del figlio corrispondente al valore.
+     */
+    public int testCondition(Object value) {
+        int i = 0;
+        for (SplitInfo info : mapSplit) {
+            if (value.equals(info.getSplitValue())) return i;
+            i++;
         }
         return -1;
-    }
-
-    public String toString() {
-        return super.toString();
     }
 }

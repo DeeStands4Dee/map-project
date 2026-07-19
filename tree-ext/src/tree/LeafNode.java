@@ -1,33 +1,55 @@
 package tree;
-import data.Data;
+
 import java.io.Serializable;
+import data.Data;
 
-public class LeafNode extends Node {
+/**
+ * Classe che modella un nodo foglia dell'albero di regressione.
+ * Contiene il valore medio della classe per gli esempi che copre.
+ */
+public class LeafNode extends Node implements Serializable {
 
-    private Double predictedClassValue;
+    /** Valore medio della classe predetta dal nodo foglia. */
+    private double predictedClassValue;
 
-    LeafNode(Data trainingSet, int beginExampleIndex, int endExampleIndex) {
+    /**
+     * Costruttore che calcola il valore medio della classe.
+     * @param trainingSet dataset di addestramento.
+     * @param beginExampleIndex indice del primo esempio.
+     * @param endExampleIndex indice dell'ultimo esempio.
+     */
+    public LeafNode(Data trainingSet, int beginExampleIndex, int endExampleIndex) {
         super(trainingSet, beginExampleIndex, endExampleIndex);
-        
         double sum = 0;
-        int count = endExampleIndex - beginExampleIndex + 1;
-        
-        for (int i = beginExampleIndex; i <= endExampleIndex; i++) {
+        for (int i = beginExampleIndex; i <= endExampleIndex; i++)
             sum += trainingSet.getClassValue(i);
-        }
-        
-        this.predictedClassValue = sum / count;
+        predictedClassValue = sum / (endExampleIndex - beginExampleIndex + 1);
     }
 
-    public Double getPredictedClassValue() {
+    /**
+     * Restituisce il valore della classe predetta dal nodo foglia.
+     * @return valore medio della classe.
+     */
+    public double getPredictedClassValue() {
         return predictedClassValue;
     }
 
+    /**
+     * Restituisce 0 poiché un nodo foglia non ha figli.
+     * @return 0.
+     */
     public int getNumberOfChildren() {
         return 0;
     }
 
+    /**
+     * Restituisce una rappresentazione testuale del nodo foglia.
+     * @return stringa con il valore predetto e gli esempi coperti.
+     */
     public String toString() {
-        return "LEAF : class=" + predictedClassValue + " " + super.toString();
+        return "LEAF : class=" + predictedClassValue +
+                " Nodo: [Examples:" + getBeginExampleIndex() +
+                "-" + getEndExampleIndex() + "]" +
+                " variance:" + getVariance();
     }
 }

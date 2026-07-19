@@ -11,6 +11,11 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
+/**
+ * Controller della finestra principale dell'applicazione client.
+ * Gestisce la comunicazione con il server e l'interazione con l'utente
+ * tramite l'interfaccia grafica JavaFX.
+ */
 public class MainWindowController {
 
     @FXML private TextField serverField;
@@ -28,11 +33,19 @@ public class MainWindowController {
     @FXML private Button disconnectButton;
     @FXML private TextArea rulesArea;
 
+    /** Socket per la comunicazione con il server. */
     private Socket socket;
+    /** Stream per la ricezione di oggetti dal server. */
     private ObjectInputStream in;
+    /** Stream per l'invio di oggetti al server. */
     private ObjectOutputStream out;
+    /** Flag che indica se l'albero è pronto per la predizione. */
     private volatile boolean treeReady = false;
 
+    /**
+     * Gestisce la connessione al server.
+     * Legge indirizzo e porta dai campi di testo e stabilisce la connessione.
+     */
     @FXML
     private void handleConnect() {
         new Thread(() -> {
@@ -55,6 +68,10 @@ public class MainWindowController {
         }).start();
     }
 
+    /**
+     * Gestisce la disconnessione dal server.
+     * Chiude il socket e reimposta lo stato dell'interfaccia.
+     */
     @FXML
     private void handleDisconnect() {
         new Thread(() -> {
@@ -81,6 +98,10 @@ public class MainWindowController {
         }).start();
     }
 
+    /**
+     * Gestisce il reset della predizione.
+     * Pulisce la ComboBox e il risultato, invia segnale di reset al server.
+     */
     @FXML
     private void handleReset() {
         new Thread(() -> {
@@ -101,6 +122,10 @@ public class MainWindowController {
         }).start();
     }
 
+    /**
+     * Gestisce l'apprendimento dell'albero dal database.
+     * Invia il nome della tabella al server e riceve le regole dell'albero.
+     */
     @FXML
     private void handleLearn() {
         String table = tableField.getText();
@@ -134,6 +159,10 @@ public class MainWindowController {
         }).start();
     }
 
+    /**
+     * Gestisce il caricamento dell'albero da file.
+     * Invia il nome del file al server e riceve le regole dell'albero.
+     */
     @FXML
     private void handleLoad() {
         String table = tableField.getText();
@@ -160,6 +189,10 @@ public class MainWindowController {
         }).start();
     }
 
+    /**
+     * Gestisce l'avvio della predizione.
+     * Invia la richiesta al server e mostra le opzioni nella ComboBox.
+     */
     @FXML
     private void handlePredict() {
         if (!treeReady) return;
@@ -200,6 +233,10 @@ public class MainWindowController {
         }).start();
     }
 
+    /**
+     * Gestisce la scelta dell'utente nella ComboBox.
+     * Invia la scelta al server e riceve la prossima query o il risultato finale.
+     */
     @FXML
     private void handleChoice() {
         String selected = choiceBox.getSelectionModel().getSelectedItem();
@@ -237,6 +274,10 @@ public class MainWindowController {
         }).start();
     }
 
+    /**
+     * Aggiunge un messaggio al log dell'interfaccia grafica.
+     * @param msg messaggio da aggiungere al log.
+     */
     private void log(String msg) {
         Platform.runLater(() -> logArea.appendText(msg + "\n"));
     }
