@@ -1,6 +1,7 @@
+/client/
+/data/
+/database/
+/exceptions/
 /server/
 /tree/
-/database/
-/data/
-/exceptions/
-/client/
+/utility/
